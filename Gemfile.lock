@@ -1,0 +1,23 @@
+PATH
+  remote: .
+  specs:
+    abnormal (0.0.0)
+      mongo
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    bson (1.3.1)
+    bson_ext (1.3.1)
+    mongo (1.3.1)
+      bson (>= 1.3.1)
+    rake (0.8.7)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  abnormal!
+  bson_ext
+  mongo
+  rake
