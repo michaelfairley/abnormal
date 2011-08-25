@@ -13,4 +13,8 @@ class Abnormal
   def self.get_test(test_id)
     db['tests'].find_one(:id => test_id)
   end
+
+  def self.tests
+    db['tests'].find.to_a
+  end
 end
