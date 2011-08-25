@@ -4,4 +4,5 @@ gemspec
 group :development do
   gem 'mongo'
   gem 'bson_ext'
+  gem 'rspec'
 end

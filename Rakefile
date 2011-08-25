@@ -1,17 +1,10 @@
 require 'rake'
-require 'rake/testtask'
+require 'rspec/core/rake_task'
 require File.expand_path('../lib/abnormal/version', __FILE__)
 
-desc 'Default: run unit tests.'
-task :default => :test
+RSpec::Core::RakeTask.new(:spec)
 
-desc 'Test the A/Bnormal plugin.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.libs << 'test'
-  t.pattern = 'test/**/test_*.rb'
-  t.verbose = true
-end
+task :default => :spec
 
 desc 'Builds the gem'
 task :build do
