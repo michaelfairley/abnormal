@@ -5,4 +5,6 @@ group :development do
   gem 'mongo'
   gem 'bson_ext'
   gem 'rspec'
+  gem 'simplecov'
+  gem 'ZenTest', "~> 4.4.2"
 end
