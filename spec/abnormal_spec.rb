@@ -23,12 +23,50 @@ describe Abnormal do
         Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
 	Abnormal.get_test(Digest::MD5.hexdigest('test'))['name'].should == 'test'
       end
+    end
 
-      it "doesn't add a duplicate test when the same test is called" do
+    describe "multiple calls for the same test" do
+      it "doesn't add a duplicate test" do
         Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
         Abnormal.ab_test('id2', 'test', [1, 2], 'conversion')
         Abnormal.should have(1).tests
       end
+    end
+
+    describe "multiple calls for multiple tests" do
+      it "should create multiple tests" do
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.ab_test('id', 'test2', [1, 2], 'conversion')
+        Abnormal.should have(2).tests
+      end
+    end
+  end
+
+  # I don't like any of these... is there a better way to do this?
+  describe "choose_alternative" do
+    it "returns the same result for the same user and test" do
+      alt1 = Abnormal.chose_alternative('id', 'test', [1, 2])
+      alt2 = Abnormal.chose_alternative('id', 'test', [1, 2])
+      alt1.should == alt2
+    end
+
+    it "returns different results for different users" do
+      alt1 = Abnormal.chose_alternative('id1', 'test', [1, 2])
+      alt2 = Abnormal.chose_alternative('id2', 'test', [1, 2])
+      alt1.should_not == alt2
+    end
+
+    it "returns different results for different tests" do
+      alt1 = Abnormal.chose_alternative('id', 'test_1', [1, 2])
+      alt2 = Abnormal.chose_alternative('id', 'test2', [1, 2])
+      alt1.should_not == alt2
+    end
+
+    it "returns all possible alternatives" do
+      alternatives = [1, 2]
+      actual_alternatives = (1..10).map{|i| Abnormal.chose_alternative("id#{i}", 'test', alternatives) }
+
+      actual_alternatives.to_set.should == alternatives.to_set
     end
   end
 end

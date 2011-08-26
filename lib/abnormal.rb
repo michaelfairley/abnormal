@@ -17,4 +17,9 @@ class Abnormal
   def self.tests
     db['tests'].find.to_a
   end
+
+  def self.chose_alternative(identity, test_name, alternatives)
+    index = Digest::MD5.hexdigest(test_name + identity).to_i(16) % alternatives.size
+    alternatives[index]
+  end
 end
