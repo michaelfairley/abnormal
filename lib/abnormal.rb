@@ -10,11 +10,10 @@ class Abnormal
     conversions = [conversions]  unless conversions.is_a? Array
 
     db['tests'].update(
-      {:name => test_name},
+      {:name => test_name, :_id => Digest::MD5.hexdigest(test_name)},
       {
         :$set => {
           :alternatives => alternatives,
-          :hash => Digest::MD5.hexdigest(test_name),
         },
         :$addToSet => {
           :conversions => {:$each => conversions}
@@ -26,8 +25,8 @@ class Abnormal
     chose_alternative(identity, test_name, alternatives)
   end
 
-  def self.get_test(test_hash)
-    db['tests'].find_one(:hash => test_hash)
+  def self.get_test(test_id)
+    db['tests'].find_one(:_id => test_id)
   end
 
   def self.tests
