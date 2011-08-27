@@ -7,9 +7,19 @@ class Abnormal
   end
 
   def self.ab_test(identity, test_name, alternatives, conversions)
+    conversions = [conversions]  unless conversions.is_a? Array
+
     db['tests'].update(
       {:name => test_name},
-      {:$set => {:alternatives => alternatives, :hash => Digest::MD5.hexdigest(test_name)}},
+      {
+        :$set => {
+          :alternatives => alternatives,
+          :hash => Digest::MD5.hexdigest(test_name),
+        },
+        :$addToSet => {
+          :conversions => {:$each => conversions}
+        }
+      },
       :upsert => true
     )
 

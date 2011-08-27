@@ -41,6 +41,36 @@ describe Abnormal do
       end
     end
 
+    describe "a call with one conversion" do
+      it "sets that conversion on the test" do
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].to_set.should == %w[conversion].to_set
+      end
+    end
+
+    describe "multiple calls with the same conversion" do
+      it "doesn't add a duplicate conversions" do
+        Abnormal.ab_test('id1', 'test', [1, 2], 'conversion')
+        Abnormal.ab_test('id2', 'test', [1, 2], 'conversion')
+        Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].should have(1).items
+      end
+    end
+
+    describe "a call with multiple conversions" do
+      it "sets all of the conversions" do
+        Abnormal.ab_test('id', 'test', [1, 2], %w[conversion1 conversion2])
+        Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].to_set.should == %w[conversion1 conversion2].to_set
+      end
+    end
+
+    describe "multiple calls with different conversions" do
+      it "sets all of the conversions" do
+        Abnormal.ab_test('id1', 'test', [1, 2], 'conversion1')
+        Abnormal.ab_test('id2', 'test', [1, 2], 'conversion2')
+        Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].to_set.should == %w[conversion1 conversion2].to_set
+      end
+    end
+
     it "returns the correct alternative" do
       Abnormal.stub(:chose_alternative){ 3 }
       Abnormal.ab_test('id', 'test', [1, 2], 'conversion').should == 3
