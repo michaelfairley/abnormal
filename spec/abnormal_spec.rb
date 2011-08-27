@@ -27,15 +27,15 @@ describe Abnormal do
 
     describe "multiple calls for the same test" do
       it "doesn't add a duplicate test" do
-        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.ab_test('id1', 'test', [1, 2], 'conversion')
         Abnormal.ab_test('id2', 'test', [1, 2], 'conversion')
         Abnormal.should have(1).tests
       end
     end
 
     describe "multiple calls for multiple tests" do
-      it "should create multiple tests" do
-        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+      it "creates multiple tests" do
+        Abnormal.ab_test('id', 'test1', [1, 2], 'conversion')
         Abnormal.ab_test('id', 'test2', [1, 2], 'conversion')
         Abnormal.should have(2).tests
       end
