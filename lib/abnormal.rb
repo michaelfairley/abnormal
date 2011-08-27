@@ -9,15 +9,15 @@ class Abnormal
   def self.ab_test(identity, test_name, alternatives, conversions)
     db['tests'].update(
       {:name => test_name},
-      {:$set => {:alternatives => alternatives, :id => Digest::MD5.hexdigest(test_name)}},
+      {:$set => {:alternatives => alternatives, :hash => Digest::MD5.hexdigest(test_name)}},
       :upsert => true
     )
 
     chose_alternative(identity, test_name, alternatives)
   end
 
-  def self.get_test(test_id)
-    db['tests'].find_one(:id => test_id)
+  def self.get_test(test_hash)
+    db['tests'].find_one(:hash => test_hash)
   end
 
   def self.tests
