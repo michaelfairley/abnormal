@@ -7,7 +7,13 @@ class Abnormal
   end
 
   def self.ab_test(identity, test_name, alternatives, conversions)
-    db['tests'].update({:name => test_name}, {:$set => {:alternatives => alternatives, :id => Digest::MD5.hexdigest(test_name)}}, :upsert => true)
+    db['tests'].update(
+      {:name => test_name},
+      {:$set => {:alternatives => alternatives, :id => Digest::MD5.hexdigest(test_name)}},
+      :upsert => true
+    )
+
+    chose_alternative(identity, test_name, alternatives)
   end
 
   def self.get_test(test_id)

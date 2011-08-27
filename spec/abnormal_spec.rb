@@ -40,6 +40,11 @@ describe Abnormal do
         Abnormal.should have(2).tests
       end
     end
+
+    it "returns the correct alternative" do
+      Abnormal.stub(:chose_alternative){ 3 }
+      Abnormal.ab_test('id', 'test', [1, 2], 'conversion').should == 3
+    end
   end
 
   # I don't like any of these... is there a better way to do this?
