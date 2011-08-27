@@ -7,4 +7,5 @@ group :development do
   gem 'rspec'
   gem 'simplecov'
   gem 'ZenTest', "~> 4.4.2"
+  gem 'autotest-growl'
 end
