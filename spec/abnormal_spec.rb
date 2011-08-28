@@ -15,6 +15,7 @@ describe Abnormal do
 
   before(:each) do
     Abnormal.db['tests'].drop
+    Abnormal.db['participations'].drop
   end
 
   describe 'ab_test' do
@@ -68,6 +69,52 @@ describe Abnormal do
         Abnormal.ab_test('id1', 'test', [1, 2], 'conversion1')
         Abnormal.ab_test('id2', 'test', [1, 2], 'conversion2')
         Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].to_set.should == %w[conversion1 conversion2].to_set
+      end
+    end
+
+    describe "the first call by an identity that has not participated in the test with the conversion" do
+      it "records in the participation" do
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.get_participation('id', 'test', 'conversion').should be
+      end
+    end
+
+    describe "subsequent calls by an identity that has participated in the test with the conversion" do
+      it "records in the participation" do
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.should have(1).participations
+      end
+    end
+
+    describe "a call with multiple conversions" do
+      it "makes multiple participations" do
+        Abnormal.ab_test('id1', 'test', [1, 2], %w[conversion1 conversion2])
+        Abnormal.should have(2).participations
+      end
+    end
+
+    describe "different calls by different identities" do
+      it "makes different participations" do
+        Abnormal.ab_test('id1', 'test', [1, 2], 'conversion')
+        Abnormal.ab_test('id2', 'test', [1, 2], 'conversion')
+        Abnormal.should have(2).participations
+      end
+    end
+
+    describe "different calls for different tests" do
+      it "makes different participations" do
+        Abnormal.ab_test('id', 'test1', [1, 2], 'conversion')
+        Abnormal.ab_test('id', 'test2', [1, 2], 'conversion')
+        Abnormal.should have(2).participations
+      end
+    end
+
+    describe "different calls with different conversions" do
+      it "makes different participations" do
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion1')
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion2')
+        Abnormal.should have(2).participations
       end
     end
 

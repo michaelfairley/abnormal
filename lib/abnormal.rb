@@ -9,8 +9,9 @@ class Abnormal
   def self.ab_test(identity, test_name, alternatives, conversions)
     conversions = [conversions]  unless conversions.is_a? Array
 
+    test_id = Digest::MD5.hexdigest(test_name)
     db['tests'].update(
-      {:name => test_name, :_id => Digest::MD5.hexdigest(test_name)},
+      {:name => test_name, :_id => test_id},
       {
         :$set => {
           :alternatives => alternatives,
@@ -22,6 +23,20 @@ class Abnormal
       :upsert => true
     )
 
+    conversions.each do |conversion|
+      db['participations'].update(
+        {
+          :participant => identity,
+          :test_id => test_id,
+          :conversion => conversion
+        },
+        {
+          :$set => {:conversions => 0}
+        },
+        :upsert => true
+      )
+    end
+
     chose_alternative(identity, test_name, alternatives)
   end
 
@@ -31,6 +46,18 @@ class Abnormal
 
   def self.tests
     db['tests'].find.to_a
+  end
+
+  def self.get_participation(id, test_name, conversion)
+    db['participations'].find_one(
+      :participant => id,
+      :test_id => Digest::MD5.hexdigest(test_name),
+      :conversion => conversion
+    )
+  end
+
+  def self.participations
+    db['participations'].find.to_a
   end
 
   def self.chose_alternative(identity, test_name, alternatives)
