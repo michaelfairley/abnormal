@@ -40,6 +40,19 @@ class Abnormal
     chose_alternative(identity, test_name, alternatives)
   end
 
+  def self.convert!(identity, conversion)
+    db['participations'].update(
+      {
+        :participant => identity,
+        :conversion => conversion
+      },
+      {
+        :$inc => {:conversions => 1}
+      },
+      :multi => true
+    )
+  end
+
   def self.get_test(test_id)
     db['tests'].find_one(:_id => test_id)
   end
