@@ -155,6 +155,11 @@ describe Abnormal do
 
       actual_alternatives.to_set.should == alternatives.to_set
     end
+
+    it "uses normalize_alternatives" do
+      Abnormal.stub(:normalize_alternatives){ [3] }
+      Abnormal.chose_alternative('id', 'test1', [1, 2]).should == 3
+    end
   end
 
   describe "convert!" do
@@ -209,6 +214,26 @@ describe Abnormal do
         Abnormal.convert!(identity, 'conversion1')
         Abnormal.get_participation(identity, 'test1', 'conversion1')['conversions'].should == 1
         Abnormal.get_participation(identity, 'test2', 'conversion2')['conversions'].should == 0
+      end
+    end
+  end
+
+  describe "normalize_alternatives" do
+    describe "given an array" do
+      it "returns the array" do
+        Abnormal.normalize_alternatives([1, 2, 7]).should == [1, 2, 7]
+      end
+    end
+
+    describe "given a hash" do
+      it "expands the hash into an array" do
+        Abnormal.normalize_alternatives({:a => 1, :b => 9}).should == [:a, :b, :b, :b, :b, :b, :b, :b, :b, :b]
+      end
+    end
+
+    describe "given a range" do
+      it "converts the range into a hash" do
+        Abnormal.normalize_alternatives(1..10).should == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
       end
     end
   end

@@ -74,7 +74,22 @@ class Abnormal
   end
 
   def self.chose_alternative(identity, test_name, alternatives)
-    index = Digest::MD5.hexdigest(test_name + identity).to_i(16) % alternatives.size
-    alternatives[index]
+    alternatives_array = normalize_alternatives(alternatives)
+    index = Digest::MD5.hexdigest(test_name + identity).to_i(16) % alternatives_array.size
+    alternatives_array[index]
+  end
+
+  def self.normalize_alternatives(alternatives)
+    case alternatives
+    when Array
+      alternatives
+    when Hash
+      alternatives_array = []
+      idx = 0
+      alternatives.each{|k,v| alternatives_array.fill(k, idx, v); idx += v}
+      alternatives_array
+    when Range
+      alternatives.to_a
+    end
   end
 end
