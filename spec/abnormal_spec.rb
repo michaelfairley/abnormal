@@ -204,11 +204,27 @@ describe Abnormal do
       end
     end
 
+    describe "multiple conversions for the same user" do
+      it "counts each of the conversions" do
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.convert!('id', 'conversion')
+        Abnormal.convert!('id', 'conversion')
+        Abnormal.get_participation('id', 'test', 'conversion')['conversions'].should == 2
+      end
+    end
+
     describe "with an explicit score" do
       it "increments by that score" do
         Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
         Abnormal.convert!('id', 'conversion', 3)
         Abnormal.get_participation('id', 'test', 'conversion')['conversions'].should == 3
+      end
+
+      it "works with floats too" do
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.convert!('id', 'conversion', 2.5)
+        Abnormal.convert!('id', 'conversion', 1.5)
+        Abnormal.get_participation('id', 'test', 'conversion')['conversions'].should == 4
       end
     end
   end
