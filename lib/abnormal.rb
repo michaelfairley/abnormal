@@ -37,7 +37,7 @@ class Abnormal
       )
     end
 
-    chose_alternative(identity, test_name, alternatives)
+    choose_alternative(identity, test_name, alternatives)
   end
 
   def self.convert!(identity, conversion)
@@ -73,7 +73,7 @@ class Abnormal
     db['participations'].find.to_a
   end
 
-  def self.chose_alternative(identity, test_name, alternatives)
+  def self.choose_alternative(identity, test_name, alternatives)
     alternatives_array = normalize_alternatives(alternatives)
     index = Digest::MD5.hexdigest(test_name + identity).to_i(16) % alternatives_array.size
     alternatives_array[index]

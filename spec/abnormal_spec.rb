@@ -124,7 +124,7 @@ describe Abnormal do
     end
 
     it "returns the correct alternative" do
-      Abnormal.stub(:chose_alternative){ 3 }
+      Abnormal.stub(:choose_alternative){ 3 }
       Abnormal.ab_test('id', 'test', [1, 2], 'conversion').should == 3
     end
   end
@@ -132,33 +132,33 @@ describe Abnormal do
   # I don't like any of these... is there a better way to do this?
   describe "choose_alternative" do
     it "returns the same result for the same user and test" do
-      alt1 = Abnormal.chose_alternative('id', 'test', [1, 2])
-      alt2 = Abnormal.chose_alternative('id', 'test', [1, 2])
+      alt1 = Abnormal.choose_alternative('id', 'test', [1, 2])
+      alt2 = Abnormal.choose_alternative('id', 'test', [1, 2])
       alt1.should == alt2
     end
 
     it "returns different results for different users" do
-      alt1 = Abnormal.chose_alternative('id1', 'test', [1, 2])
-      alt2 = Abnormal.chose_alternative('id2', 'test', [1, 2])
+      alt1 = Abnormal.choose_alternative('id1', 'test', [1, 2])
+      alt2 = Abnormal.choose_alternative('id2', 'test', [1, 2])
       alt1.should_not == alt2
     end
 
     it "returns different results for different tests" do
-      alt1 = Abnormal.chose_alternative('id', 'test_1', [1, 2])
-      alt2 = Abnormal.chose_alternative('id', 'test2', [1, 2])
+      alt1 = Abnormal.choose_alternative('id', 'test_1', [1, 2])
+      alt2 = Abnormal.choose_alternative('id', 'test2', [1, 2])
       alt1.should_not == alt2
     end
 
     it "returns all possible alternatives" do
       alternatives = [1, 2]
-      actual_alternatives = (1..10).map{|i| Abnormal.chose_alternative("id#{i}", 'test', alternatives) }
+      actual_alternatives = (1..10).map{|i| Abnormal.choose_alternative("id#{i}", 'test', alternatives) }
 
       actual_alternatives.to_set.should == alternatives.to_set
     end
 
     it "uses normalize_alternatives" do
       Abnormal.stub(:normalize_alternatives){ [3] }
-      Abnormal.chose_alternative('id', 'test1', [1, 2]).should == 3
+      Abnormal.choose_alternative('id', 'test1', [1, 2]).should == 3
     end
   end
 
