@@ -40,14 +40,14 @@ class Abnormal
     choose_alternative(identity, test_name, alternatives)
   end
 
-  def self.convert!(identity, conversion)
+  def self.convert!(identity, conversion, score = 1)
     db['participations'].update(
       {
         :participant => identity,
         :conversion => conversion
       },
       {
-        :$inc => {:conversions => 1}
+        :$inc => {:conversions => score}
       },
       :multi => true
     )

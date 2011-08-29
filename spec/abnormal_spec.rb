@@ -216,6 +216,14 @@ describe Abnormal do
         Abnormal.get_participation(identity, 'test2', 'conversion2')['conversions'].should == 0
       end
     end
+
+    describe "with an explicit score" do
+      it "increments by that score" do
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.convert!('id', 'conversion', 3)
+        Abnormal.get_participation('id', 'test', 'conversion')['conversions'].should == 3
+      end
+    end
   end
 
   describe "normalize_alternatives" do
