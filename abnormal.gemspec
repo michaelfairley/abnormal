@@ -9,11 +9,12 @@ Gem::Specification.new do |s|
   s.authors            = ['Michael Fairley']
   s.email              = ['michaelfairley@gmail.com']
   s.version            = Abnormal::VERSION
-  s.files              = Dir.glob("{lib,test}/**/*") + %w[MIT-LICENSE README]
+  s.files              = Dir.glob("{lib,test,spec}/**/*") + %w[MIT-LICENSE README.md]
   s.license            = 'MIT'
-  s.test_files         = Dir.glob('test/*.rb')
+  s.test_files         = Dir.glob('test/*.rb') + Dir.glob('spec/*.rb')
 
   s.add_dependency 'mongo'
 
   s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec'
 end
