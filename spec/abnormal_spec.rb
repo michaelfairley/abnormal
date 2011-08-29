@@ -170,50 +170,37 @@ describe Abnormal do
       end
 
       it "does not apply to future participations" do
-        identity = 'id'
-        test_name = 'test'
-        conversion = 'conversion'
-
-        Abnormal.convert!(identity, conversion)
-        Abnormal.ab_test(identity, test_name, [1, 2], conversion)
-        Abnormal.get_participation(identity, test_name, conversion)['conversions'].should == 0
+        Abnormal.convert!('id', 'conversion')
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.get_participation('id', 'test', 'conversion')['conversions'].should == 0
       end
     end
 
     describe "with an identity/conversion pair that does exist" do
       it "records the conversions" do
-        identity = 'id'
-        test_name = 'test'
-        conversion = 'conversion'
-
-        Abnormal.ab_test(identity, test_name, [1, 2], conversion)
-        Abnormal.convert!(identity, conversion)
-        Abnormal.get_participation(identity, test_name, conversion)['conversions'].should == 1
+        Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
+        Abnormal.convert!('id', 'conversion')
+        Abnormal.get_participation('id', 'test', 'conversion')['conversions'].should == 1
       end
     end
 
     describe "an identity participating in multiple tests with the conversions" do
       it "records the conversion for the each test" do
-        identity = 'id'
-        conversion = 'conversion'
-
-        Abnormal.ab_test(identity, 'test1', [1, 2], conversion)
-        Abnormal.ab_test(identity, 'test2', [1, 2], conversion)
-        Abnormal.convert!(identity, conversion)
-        Abnormal.get_participation(identity, 'test1', conversion)['conversions'].should == 1
-        Abnormal.get_participation(identity, 'test2', conversion)['conversions'].should == 1
+        Abnormal.ab_test('id', 'test1', [1, 2], 'conversion')
+        Abnormal.ab_test('id', 'test2', [1, 2], 'conversion')
+        Abnormal.convert!('id', 'conversion')
+        Abnormal.get_participation('id', 'test1', 'conversion')['conversions'].should == 1
+        Abnormal.get_participation('id', 'test2', 'conversion')['conversions'].should == 1
       end
     end
 
     describe "an identity participating in multiple tests, not all of which have the conversion" do
       it "only records a conversion for the test listening to that conversion" do
-        identity = 'id'
-
-        Abnormal.ab_test(identity, 'test1', [1, 2], 'conversion1')
-        Abnormal.ab_test(identity, 'test2', [1, 2], 'conversion2')
-        Abnormal.convert!(identity, 'conversion1')
-        Abnormal.get_participation(identity, 'test1', 'conversion1')['conversions'].should == 1
-        Abnormal.get_participation(identity, 'test2', 'conversion2')['conversions'].should == 0
+        Abnormal.ab_test('id', 'test1', [1, 2], 'conversion1')
+        Abnormal.ab_test('id', 'test2', [1, 2], 'conversion2')
+        Abnormal.convert!('id', 'conversion1')
+        Abnormal.get_participation('id', 'test1', 'conversion1')['conversions'].should == 1
+        Abnormal.get_participation('id', 'test2', 'conversion2')['conversions'].should == 0
       end
     end
 
