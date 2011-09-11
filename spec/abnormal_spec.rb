@@ -6,7 +6,7 @@ SimpleCov.start
 $:.unshift File.expand_path('../../lib', __FILE__)
 require 'abnormal'
 
-Bundler.require
+Bundler.require(:development)
 
 describe Abnormal do
   before(:all) do
