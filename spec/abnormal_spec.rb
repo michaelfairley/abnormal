@@ -241,7 +241,7 @@ describe Abnormal do
 
     describe "given a hash" do
       it "expands the hash into an array" do
-        Abnormal.normalize_alternatives({:a => 1, :b => 9}).should == [:a, :b, :b, :b, :b, :b, :b, :b, :b, :b]
+        Abnormal.normalize_alternatives({:a => 1, :b => 9}).should =~ [:a, :b, :b, :b, :b, :b, :b, :b, :b, :b]
       end
     end
 
