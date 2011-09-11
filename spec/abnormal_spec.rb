@@ -1,7 +1,10 @@
 require 'rubygems'
 require 'bundler/setup'
-require 'simplecov'  if RUBY_VERSION > "1.9.0"
-SimpleCov.start
+
+if RUBY_VERSION > "1.9.0"
+  require 'simplecov'
+  SimpleCov.start
+end
 
 $:.unshift File.expand_path('../../lib', __FILE__)
 require 'abnormal'
