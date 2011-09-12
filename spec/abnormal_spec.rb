@@ -251,4 +251,111 @@ describe Abnormal do
       end
     end
   end
+
+  describe "data_for_report" do
+    before(:each) do
+      Abnormal.stub(:choose_alternative) do |id, test, alts|
+        case [id, test]
+        when ['id1', 'test1']
+          1
+        when ['id1', 'test2']
+          2
+        when ['id2', 'test1']
+          2
+        when ['id2', 'test2']
+          1
+        end
+      end
+
+      Abnormal.ab_test('id1', 'test1', [1, 2], ['conversion1', 'conversion2'])
+      Abnormal.ab_test('id1', 'test2', [1, 2], 'conversion1')
+      Abnormal.convert!('id1', 'conversion1')
+
+      Abnormal.ab_test('id2', 'test1', [1, 2], ['conversion1', 'conversion2'])
+      Abnormal.ab_test('id2', 'test2', [1, 2], 'conversion1')
+      Abnormal.convert!('id2', 'conversion1', 3)
+    end
+
+    it "returns the data in the correct format" do
+      Abnormal.data_for_report.should ==
+        [
+          {
+            :name => 'test1',
+            :conversions => [
+              {
+                :name => 'conversion1',
+                :part => 2,
+                :part_uniq => 2,
+                :conv => 4,
+                :conv_uniq => 2,
+                :alternatives => [
+                  {
+                    :value => "1",
+                    :part => 1,
+                    :part_uniq => 1,
+                    :conv => 1,
+                    :conv_uniq => 1
+                  },
+                  {
+                    :value => "2",
+                    :part => 1,
+                    :part_uniq => 1,
+                    :conv => 3,
+                    :conv_uniq => 1
+                  }
+                ]
+              },{
+                :name => 'conversion2',
+                :part => 2,
+                :part_uniq => 2,
+                :conv => 0,
+                :conv_uniq => 0,
+                :alternatives => [
+                  {
+                    :value => "1",
+                    :part => 1,
+                    :part_uniq => 1,
+                    :conv => 0,
+                    :conv_uniq => 0
+                  },
+                  {
+                    :value => "2",
+                    :part => 1,
+                    :part_uniq => 1,
+                    :conv => 0,
+                    :conv_uniq => 0
+                  }
+                ]
+              }
+            ]
+          },{
+            :name => 'test2',
+            :conversions => [
+              {
+                :name => 'conversion1',
+                :part => 2,
+                :part_uniq => 2,
+                :conv => 4,
+                :conv_uniq => 2,
+                :alternatives => [
+                  {
+                    :value => "2",
+                    :part => 1,
+                    :part_uniq => 1,
+                    :conv => 1,
+                    :conv_uniq => 1
+                  },{
+                    :value => "1",
+                    :part => 1,
+                    :part_uniq => 1,
+                    :conv => 3,
+                    :conv_uniq => 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+    end
+  end
 end

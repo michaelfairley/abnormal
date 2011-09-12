@@ -23,6 +23,8 @@ class Abnormal
       :upsert => true
     )
 
+    alternative = choose_alternative(identity, test_name, alternatives)
+
     conversions.each do |conversion|
       db['participations'].update(
         {
@@ -31,13 +33,14 @@ class Abnormal
           :conversion => conversion
         },
         {
-          :$set => {:conversions => 0}
+          :$inc => {:conversions => 0},
+          :$set => {:alternative => alternative.inspect}
         },
         :upsert => true
       )
     end
 
-    choose_alternative(identity, test_name, alternatives)
+    alternative
   end
 
   def self.convert!(identity, conversion, score = 1)
@@ -59,6 +62,50 @@ class Abnormal
 
   def self.tests
     db['tests'].find.to_a
+  end
+
+  def self.data_for_report
+    counts = db['participations'].group(
+      :key => [:test_id, :conversion, :alternative],
+      :initial => {
+        :part => 0,
+        :part_uniq => 0,
+        :conv => 0,
+        :conv_uniq => 0
+      },
+      :reduce => "function(obj, prev) {
+        prev.part += 1;
+        prev.part_uniq++;
+        prev.conv += obj.conversions;
+        if (obj.conversions > 0){
+          prev.conv_uniq++;
+        }
+      }"
+    )
+
+    counts.group_by { |count| count['test_id'] }.map do |test_id, counts|
+      {
+        :name => get_test(test_id)['name'],
+        :conversions => counts.group_by { |count| count['conversion'] }.map do |conversion, counts|
+          {
+            :name => conversion,
+            :part => counts.inject(0){ |sum,count| sum += count['part'] }.to_i,
+            :part_uniq => counts.inject(0){ |sum,count| sum += count['part_uniq'] }.to_i,
+            :conv => counts.inject(0){ |sum,count| sum += count['conv'] }.to_i,
+            :conv_uniq => counts.inject(0){ |sum,count| sum += count['conv_uniq'] }.to_i,
+            :alternatives => counts.map do |count|
+              {
+                :value => count['alternative'],
+                :part => count['part'].to_i,
+                :part_uniq => count['part_uniq'].to_i,
+                :conv => count['conv'].to_i,
+                :conv_uniq => count['conv_uniq'].to_i
+              }
+            end
+          }
+        end
+      }
+    end
   end
 
   def self.get_participation(id, test_name, conversion)
