@@ -33,7 +33,10 @@ class Abnormal
           :conversion => conversion
         },
         {
-          :$inc => {:conversions => 0},
+          :$inc => {
+            :conversions => 0,
+            :participations => 1
+	  },
           :$set => {:alternative => alternative.inspect}
         },
         :upsert => true
@@ -74,8 +77,10 @@ class Abnormal
         :conv_uniq => 0
       },
       :reduce => "function(obj, prev) {
-        prev.part += 1;
-        prev.part_uniq++;
+        prev.part += obj.participations;
+        if (obj.participations > 0){
+          prev.part_uniq++;
+        }
         prev.conv += obj.conversions;
         if (obj.conversions > 0){
           prev.conv_uniq++;

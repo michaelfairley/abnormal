@@ -76,9 +76,9 @@ describe Abnormal do
     end
 
     describe "the first call by an identity that has not participated in the test with the conversion" do
-      it "records in the participation" do
+      it "records the participation" do
         Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
-        Abnormal.get_participation('id', 'test', 'conversion').should be
+        Abnormal.get_participation('id', 'test', 'conversion')['participations'].should == 1
       end
 
       it "has 0 conversions" do
@@ -88,10 +88,11 @@ describe Abnormal do
     end
 
     describe "subsequent calls by an identity that has participated in the test with the conversion" do
-      it "records in the participation" do
+      it "records in participations" do
         Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
         Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
         Abnormal.should have(1).participations
+        Abnormal.get_participation('id', 'test', 'conversion')['participations'].should == 2
       end
     end
 
@@ -269,6 +270,7 @@ describe Abnormal do
 
       Abnormal.ab_test('id1', 'test1', [1, 2], ['conversion1', 'conversion2'])
       Abnormal.ab_test('id1', 'test2', [1, 2], 'conversion1')
+      Abnormal.ab_test('id1', 'test2', [1, 2], 'conversion1')
       Abnormal.convert!('id1', 'conversion1')
 
       Abnormal.ab_test('id2', 'test1', [1, 2], ['conversion1', 'conversion2'])
@@ -333,14 +335,14 @@ describe Abnormal do
             :conversions => [
               {
                 :name => 'conversion1',
-                :part => 2,
+                :part => 3,
                 :part_uniq => 2,
                 :conv => 4,
                 :conv_uniq => 2,
                 :alternatives => [
                   {
                     :value => "2",
-                    :part => 1,
+                    :part => 2,
                     :part_uniq => 1,
                     :conv => 1,
                     :conv_uniq => 1
