@@ -75,6 +75,14 @@ describe Abnormal do
       end
     end
 
+    describe "a call with no conversions" do
+      it "uses the default conversions" do
+        Abnormal.default_conversions = %w[conversion1 conversion2]
+        Abnormal.ab_test('id', 'test', [1, 2])
+        Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].to_set.should == %w[conversion1 conversion2].to_set
+      end
+    end
+
     describe "the first call by an identity that has not participated in the test with the conversion" do
       it "records the participation" do
         Abnormal.ab_test('id', 'test', [1, 2], 'conversion')

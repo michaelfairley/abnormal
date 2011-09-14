@@ -6,7 +6,15 @@ class Abnormal
     @@db = db
   end
 
-  def self.ab_test(identity, test_name, alternatives, conversions)
+  def self.default_conversions
+    @@default_conversions || []
+  end
+  def self.default_conversions=(conversions)
+    @@default_conversions = conversions
+  end
+
+  def self.ab_test(identity, test_name, alternatives, conversions = nil)
+    conversions ||= default_conversions
     conversions = [conversions]  unless conversions.is_a? Array
 
     test_id = Digest::MD5.hexdigest(test_name)
