@@ -22,7 +22,7 @@ class Abnormal
       {:name => test_name, :_id => test_id},
       {
         :$set => {
-          :alternatives => alternatives,
+          :alternatives => alternatives.map(&:to_s),
         },
         :$addToSet => {
           :conversions => {:$each => conversions}
@@ -114,11 +114,11 @@ class Abnormal
                 :conv => count['conv'].to_i,
                 :conv_uniq => count['conv_uniq'].to_i
               }
-            end
+            end.sort_by! { |alt| get_test(test_id)['alternatives'].index(alt[:value]) }
           }
-        end
+        end.sort_by! { |conversion| conversion[:name] }
       }
-    end
+    end.sort_by! { |test| test[:name] }
   end
 
   def self.get_participation(id, test_name, conversion)

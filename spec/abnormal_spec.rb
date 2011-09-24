@@ -262,7 +262,7 @@ describe Abnormal do
   end
 
   describe "data_for_report" do
-    before(:each) do
+    it "returns the data in the correct format" do
       Abnormal.stub(:choose_alternative) do |id, test, alts|
         case [id, test]
         when ['id1', 'test1']
@@ -275,7 +275,6 @@ describe Abnormal do
           1
         end
       end
-
       Abnormal.ab_test('id1', 'test1', [1, 2], ['conversion1', 'conversion2'])
       Abnormal.ab_test('id1', 'test2', [1, 2], 'conversion1')
       Abnormal.ab_test('id1', 'test2', [1, 2], 'conversion1')
@@ -284,9 +283,7 @@ describe Abnormal do
       Abnormal.ab_test('id2', 'test1', [1, 2], ['conversion1', 'conversion2'])
       Abnormal.ab_test('id2', 'test2', [1, 2], 'conversion1')
       Abnormal.convert!('id2', 'conversion1', 3)
-    end
 
-    it "returns the data in the correct format" do
       Abnormal.data_for_report.should ==
         [
           {
@@ -349,16 +346,16 @@ describe Abnormal do
                 :conv_uniq => 2,
                 :alternatives => [
                   {
-                    :value => "2",
-                    :part => 2,
-                    :part_uniq => 1,
-                    :conv => 1,
-                    :conv_uniq => 1
-                  },{
                     :value => "1",
                     :part => 1,
                     :part_uniq => 1,
                     :conv => 3,
+                    :conv_uniq => 1
+                  },{
+                    :value => "2",
+                    :part => 2,
+                    :part_uniq => 1,
+                    :conv => 1,
                     :conv_uniq => 1
                   }
                 ]
@@ -366,6 +363,39 @@ describe Abnormal do
             ]
           }
         ]
+    end
+
+    it "sorts the tests by name" do
+      Abnormal.ab_test('id', 'test2', [1, 2], 'conversion')
+      Abnormal.ab_test('id', 'test1', [1, 2], 'conversion')
+
+      Abnormal.data_for_report[0][:name].should == 'test1'
+      Abnormal.data_for_report[1][:name].should == 'test2'
+    end
+
+    it "sorts the conversions by name" do
+      Abnormal.ab_test('id', 'test', [1, 2], ['conversion2', 'conversion1'])
+
+      Abnormal.data_for_report.first[:conversions][0][:name].should == 'conversion1'
+      Abnormal.data_for_report.first[:conversions][1][:name].should == 'conversion2'
+    end
+
+
+    it "sorts the alternatives in the order they were specified" do
+      Abnormal.stub(:choose_alternative) do |id, test, alts|
+        case [id, test]
+        when ['id1', 'test']
+          1
+        when ['id2', 'test']
+          2
+        end
+      end
+
+      Abnormal.ab_test('id1', 'test', [2, 1], 'conversion')
+      Abnormal.ab_test('id2', 'test', [2, 1], 'conversion')
+
+      Abnormal.data_for_report.first[:conversions].first[:alternatives][0][:value].should == '2'
+      Abnormal.data_for_report.first[:conversions].first[:alternatives][1][:value].should == '1'
     end
   end
 end
