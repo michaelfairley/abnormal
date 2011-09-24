@@ -114,11 +114,11 @@ class Abnormal
                 :conv => count['conv'].to_i,
                 :conv_uniq => count['conv_uniq'].to_i
               }
-            end.sort_by! { |alt| get_test(test_id)['alternatives'].index(alt[:value]) }
+            end.sort_by { |alt| get_test(test_id)['alternatives'].index(alt[:value]) }
           }
-        end.sort_by! { |conversion| conversion[:name] }
+        end.sort_by { |conversion| conversion[:name] }
       }
-    end.sort_by! { |test| test[:name] }
+    end.sort_by { |test| test[:name] }
   end
 
   def self.get_participation(id, test_name, conversion)
