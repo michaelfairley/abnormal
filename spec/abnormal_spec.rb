@@ -25,7 +25,7 @@ describe Abnormal do
     describe 'the first call for a new test' do
       it "adds that test to the test table" do
         Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
-	Abnormal.get_test(Digest::MD5.hexdigest('test'))['name'].should == 'test'
+	Abnormal.get_test(Abnormal.key('test'))['name'].should == 'test'
       end
     end
 
@@ -48,7 +48,7 @@ describe Abnormal do
     describe "a call with one conversion" do
       it "sets that conversion on the test" do
         Abnormal.ab_test('id', 'test', [1, 2], 'conversion')
-        Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].to_set.should == %w[conversion].to_set
+        Abnormal.get_test(Abnormal.key('test'))['conversions'].to_set.should == %w[conversion].to_set
       end
     end
 
@@ -56,14 +56,14 @@ describe Abnormal do
       it "doesn't add a duplicate conversions" do
         Abnormal.ab_test('id1', 'test', [1, 2], 'conversion')
         Abnormal.ab_test('id2', 'test', [1, 2], 'conversion')
-        Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].should have(1).items
+        Abnormal.get_test(Abnormal.key('test'))['conversions'].should have(1).items
       end
     end
 
     describe "a call with multiple conversions" do
       it "sets all of the conversions" do
         Abnormal.ab_test('id', 'test', [1, 2], %w[conversion1 conversion2])
-        Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].to_set.should == %w[conversion1 conversion2].to_set
+        Abnormal.get_test(Abnormal.key('test'))['conversions'].to_set.should == %w[conversion1 conversion2].to_set
       end
     end
 
@@ -71,7 +71,7 @@ describe Abnormal do
       it "sets all of the conversions" do
         Abnormal.ab_test('id1', 'test', [1, 2], 'conversion1')
         Abnormal.ab_test('id2', 'test', [1, 2], 'conversion2')
-        Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].to_set.should == %w[conversion1 conversion2].to_set
+        Abnormal.get_test(Abnormal.key('test'))['conversions'].to_set.should == %w[conversion1 conversion2].to_set
       end
     end
 
@@ -79,7 +79,7 @@ describe Abnormal do
       it "uses the default conversions" do
         Abnormal.default_conversions = %w[conversion1 conversion2]
         Abnormal.ab_test('id', 'test', [1, 2])
-        Abnormal.get_test(Digest::MD5.hexdigest('test'))['conversions'].to_set.should == %w[conversion1 conversion2].to_set
+        Abnormal.get_test(Abnormal.key('test'))['conversions'].to_set.should == %w[conversion1 conversion2].to_set
       end
     end
 

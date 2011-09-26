@@ -17,12 +17,12 @@ class Abnormal
     conversions ||= default_conversions
     conversions = [conversions]  unless conversions.is_a? Array
 
-    test_id = Digest::MD5.hexdigest(test_name)
+    test_id = key(test_name)
     db['tests'].update(
       {:name => test_name, :_id => test_id},
       {
         :$set => {
-          :alternatives => alternatives.map(&:to_s),
+          :alternatives => alternatives.map(&:inspect),
         },
         :$addToSet => {
           :conversions => {:$each => conversions}
@@ -45,7 +45,7 @@ class Abnormal
             :conversions => 0,
             :participations => 1
 	  },
-          :$set => {:alternative => alternative.inspect}
+          :$set => {:alternative_id => key(alternative.inspect)}
         },
         :upsert => true
       )
@@ -77,7 +77,7 @@ class Abnormal
 
   def self.data_for_report
     counts = db['participations'].group(
-      :key => [:test_id, :conversion, :alternative],
+      :key => [:test_id, :conversion, :alternative_id],
       :initial => {
         :part => 0,
         :part_uniq => 0,
@@ -108,7 +108,7 @@ class Abnormal
             :conv_uniq => counts.inject(0){ |sum,count| sum += count['conv_uniq'] }.to_i,
             :alternatives => counts.map do |count|
               {
-                :value => count['alternative'],
+                :value => get_test(test_id)['alternatives'].detect{ |alt| count['alternative_id'] == key(alt) },
                 :part => count['part'].to_i,
                 :part_uniq => count['part_uniq'].to_i,
                 :conv => count['conv'].to_i,
@@ -124,13 +124,19 @@ class Abnormal
   def self.get_participation(id, test_name, conversion)
     db['participations'].find_one(
       :participant => id,
-      :test_id => Digest::MD5.hexdigest(test_name),
+      :test_id => key(test_name),
       :conversion => conversion
     )
   end
 
   def self.participations
     db['participations'].find.to_a
+  end
+
+  private
+
+  def self.key(string)
+    Digest::MD5.hexdigest(string)[0...16]
   end
 
   def self.choose_alternative(identity, test_name, alternatives)
