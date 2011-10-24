@@ -1,8 +1,8 @@
 if ENV['TESTX']
-  system <<-CMD
+  system "
     cd test/#{ENV['TESTX']}
     BUNDLE_GEMFILE=Gemfile bundle exec rake test
-  CMD
+  "
 else
   system 'rake'
 end
