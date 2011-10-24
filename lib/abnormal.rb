@@ -1,4 +1,5 @@
 require 'abnormal/version'
+require 'abnormal/rails'  if defined? Rails
 
 class Abnormal
   def self.db; @@db; end
@@ -11,6 +12,11 @@ class Abnormal
   end
   def self.default_conversions=(conversions)
     @@default_conversions = conversions
+  end
+
+  def self.identity; @@identity; end
+  def self.identity=(identity)
+    @@identity = identity.to_s
   end
 
   def self.ab_test(identity, test_name, alternatives, conversions = nil)

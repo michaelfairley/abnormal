@@ -2,9 +2,18 @@ require 'rake'
 require 'rspec/core/rake_task'
 require File.expand_path('../lib/abnormal/version', __FILE__)
 
+task :default => :spec
+
 RSpec::Core::RakeTask.new(:spec)
 
-task :default => :spec
+task :test_all => :spec do
+  %w[rails3].each do |dir|
+    sh <<-CMD
+      cd test/#{dir}
+      BUNDLE_GEMFILE=Gemfile bundle exec rake test
+    CMD
+  end
+end
 
 desc 'Builds the gem'
 task :build do
