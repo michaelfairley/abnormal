@@ -1,0 +1,7 @@
+if ENV['TESTX']
+  dir = "test/#{ENV['TESTX']}"
+else
+  dir =	'./'
+end
+
+eval File.read("#{dir}/Gemfile").gsub('../../', '')
