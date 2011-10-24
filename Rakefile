@@ -3,10 +3,12 @@ require 'rspec/core/rake_task'
 require File.expand_path('../lib/abnormal/version', __FILE__)
 
 if ENV['TESTX']
-  system <<-CMD
-    cd test/#{ENV['TESTX']}
-    BUNDLE_GEMFILE=Gemfile bundle exec rake test
-  CMD
+  task :default do
+    system <<-CMD
+      cd test/#{ENV['TESTX']}
+      BUNDLE_GEMFILE=Gemfile bundle exec rake test
+    CMD
+  end
 else
   task :default => :spec
 end
