@@ -12,4 +12,4 @@ gemfile:
   - Gemfile.travis
 env:
   - 
-  - TESTX=rails
+  - TESTX=rails3
