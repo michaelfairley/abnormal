@@ -4,4 +4,4 @@ else
   dir =	'./'
 end
 
-eval File.read("#{dir}/Gemfile").gsub('../../', '')
+eval File.read("#{dir}/Gemfile").gsub('../../', '../')
