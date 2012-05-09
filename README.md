@@ -1,1 +1,1 @@
-A/B testing for Ruby
+This gem has not seen significant production use, and is mostly unsupported. Use at your own risk.
